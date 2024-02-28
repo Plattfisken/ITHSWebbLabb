@@ -1,0 +1,20 @@
+﻿@page "/"
+@inject Data data
+
+<PageTitle>Home</PageTitle>
+
+<h1>Buy!</h1>
+<div id="grid">
+    @foreach(var p in data.products) {
+        <ProductComponent Product="p" OnAddToCart="() => AddToCart(p)" />
+    }
+</div>
+
+<Cart @ref="cart"/>
+
+@code {
+    private Cart cart;
+    public void AddToCart(Product product) {
+        cart.AddToCart(product);
+    }
+}

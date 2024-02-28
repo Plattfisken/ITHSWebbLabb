@@ -1,0 +1,16 @@
+<div>
+    <img src="@Product.ImageUrl" style="width: 100px; height: 100px;" />
+    <b>@Product.Name</b>
+    <p>@Product.PriceInUsd $</p>
+    <button @onclick="AddToCart">Add to cart</button>
+</div>
+
+@code {
+    [Parameter]
+    public Product? Product { get; set; }
+    [Parameter]
+    public EventCallback OnAddtoCart { get; set; }
+    public async Task AddToCart() {
+        await OnAddtoCart.InvokeAsync();
+    }
+}

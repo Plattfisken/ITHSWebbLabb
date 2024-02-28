@@ -1,0 +1,25 @@
+@inject ILocalStorageService localStorage
+
+<h1>Cart</h1>
+@foreach(var product in ProductsInCart) {
+    <p>@product.Name  @product.PriceInUsd$</p>
+}
+@if(TotalPrice > 0) {
+    <p>Total price: @TotalPrice$</p>
+}
+@code {
+    public List<Product> ProductsInCart { get; } = new List<Product>();
+    public int TotalPrice { get; private set; }
+    public void AddToCart(Product product) {
+        ProductsInCart.Add(new Product(product.Id, product.Name, product.Description, product.ImageUrl, product.PriceInUsd));
+        CalculateTotalPrice();
+        localStorage.SetItemAsync<List<Product>>("Product", ProductsInCart);
+    }
+    private void CalculateTotalPrice() {
+        int result = 0;
+        foreach (var p in ProductsInCart) {
+            result += p.PriceInUsd;
+        }
+        TotalPrice = result;
+    }
+}
