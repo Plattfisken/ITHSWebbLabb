@@ -1,7 +1,10 @@
+@inject NavigationManager navigationManager
 <div>
-    <img src="@Product.ImageUrl" style="width: 100px; height: 100px;" />
-    <b>@Product.Name</b>
-    <p>@Product.PriceInUsd $</p>
+    <div @onclick="GoToProductPage">
+        <img src="@Product.ImageUrl" style="width: 100px; height: 100px;" />
+        <b>@Product.Name</b>
+        <p>@Product.PriceInUsd $</p>
+    </div>
     <button @onclick="AddToCart">Add to cart</button>
 </div>
 
@@ -9,8 +12,11 @@
     [Parameter]
     public Product? Product { get; set; }
     [Parameter]
-    public EventCallback OnAddtoCart { get; set; }
+    public EventCallback OnAddToCart { get; set; }
     public async Task AddToCart() {
-        await OnAddtoCart.InvokeAsync();
+        await OnAddToCart.InvokeAsync();
+    }
+    public void GoToProductPage() {
+        navigationManager.NavigateTo($"/products/{Product.Id}");
     }
 }

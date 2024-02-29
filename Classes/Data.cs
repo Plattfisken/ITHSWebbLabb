@@ -11,4 +11,7 @@ public class Data
         products.Add(new Product(NextId, "Headphones", "Audio quality is good", "images/headphones.jpg", 50));
         products.Add(new Product(NextId, "Car", "Fast", "images/car.jpg", 10000));
     }
+    public Product? GetProduct(int id) {
+        return products.SingleOrDefault(p => p.Id == id);
+    }
 }

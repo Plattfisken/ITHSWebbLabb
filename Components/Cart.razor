@@ -1,25 +1,60 @@
+@page "/cart"
+@inject CartClass cartClass
+@inject CustomerInfo customerInfo
 @inject ILocalStorageService localStorage
+@inject NavigationManager navigationManager
 
 <h1>Cart</h1>
-@foreach(var product in ProductsInCart) {
+@foreach(var product in cartClass.ProductsInCart) {
     <p>@product.Name  @product.PriceInUsd$</p>
 }
 @if(TotalPrice > 0) {
     <p>Total price: @TotalPrice$</p>
 }
+@if(cartClass.ProductsInCart.Count > 0) {
+    <EditForm Model="CustomerInfoForm" OnSubmit="HandleSubmit" FormName="customerForm">
+        <label>First Name</label>
+        <InputText @bind-Value="CustomerInfoForm.FirstName">@CustomerInfoForm.FirstName</InputText>
+        
+        <label>Last Name</label>
+        <InputText @bind-Value="CustomerInfoForm.LastName">@CustomerInfoForm.LastName</InputText>
+
+        <label>Adress</label>
+        <InputText @bind-Value="CustomerInfoForm.Adress">@CustomerInfoForm.Adress</InputText>
+
+        <label>Email</label>
+        <InputText @bind-Value="CustomerInfoForm.Email">@CustomerInfoForm.Email</InputText>
+
+        <button type="submit">Submit</button>
+    </EditForm>
+}
 @code {
-    public List<Product> ProductsInCart { get; } = new List<Product>();
+    [SupplyParameterFromForm]
+    public CustomerInfo CustomerInfoForm { get; set; } = new CustomerInfo { FirstName = "", 
+                                                                            LastName = "",
+                                                                            Adress = "",
+                                                                            Email = "", };
     public int TotalPrice { get; private set; }
-    public void AddToCart(Product product) {
-        ProductsInCart.Add(new Product(product.Id, product.Name, product.Description, product.ImageUrl, product.PriceInUsd));
-        CalculateTotalPrice();
-        localStorage.SetItemAsync<List<Product>>("Product", ProductsInCart);
-    }
     private void CalculateTotalPrice() {
         int result = 0;
-        foreach (var p in ProductsInCart) {
+        foreach (var p in cartClass.ProductsInCart) {
             result += p.PriceInUsd;
         }
         TotalPrice = result;
+    }
+    private void HandleSubmit() {
+        customerInfo.FirstName = CustomerInfoForm.FirstName;
+        customerInfo.LastName = CustomerInfoForm.LastName;
+        customerInfo.Adress = CustomerInfoForm.Adress;
+        customerInfo.Email = CustomerInfoForm.Email;
+
+        navigationManager.NavigateTo("/confirm");
+    }
+    protected override async Task OnInitializedAsync() {
+        var localStorageList = await localStorage.GetItemAsync<List<Product>>("Cart");
+        if(localStorageList is not null) {
+            cartClass.ProductsInCart = localStorageList;
+        }
+        CalculateTotalPrice();
     }
 }

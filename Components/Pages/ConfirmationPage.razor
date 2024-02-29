@@ -1,0 +1,36 @@
+@page "/confirm"
+@inject CustomerInfo customerInfo
+@inject CartClass cartClass
+@inject ILocalStorageService localStorage
+@inject NavigationManager navigationManager
+<PageTitle>Confirm Purchase</PageTitle>
+<h2>Thank you for your purchase!</h2>
+<p>Please confirm that the following information is correct:<br />
+    Name: @customerInfo.FirstName @customerInfo.LastName <br />
+    Adress: @customerInfo.Adress <br />
+    Email: @customerInfo.Email <br />
+</p>
+<h3>Products:</h3>
+@foreach(var p in cartClass.ProductsInCart) {
+    <p>@p.Name @p.PriceInUsd$</p>
+}
+<b>Total: @totalPrice$</b>
+<button @onclick="Confirmed">Confirm and Purchase</button>
+@code {
+    int totalPrice;
+    private int CalculateTotalPrice() {
+        int result = 0;
+        foreach (var p in cartClass.ProductsInCart) {
+            result += p.PriceInUsd;
+        }
+        return result;
+    }
+    private async Task Confirmed() {
+        cartClass.ProductsInCart.Clear();
+        await localStorage.ClearAsync();
+        navigationManager.NavigateTo("/");
+    }
+    protected override async Task OnInitializedAsync() {
+        totalPrice = CalculateTotalPrice();
+    }
+}

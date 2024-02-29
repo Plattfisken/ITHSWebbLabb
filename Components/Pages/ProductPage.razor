@@ -1,5 +1,28 @@
-@page "/products"
 @page "/products/{id:int}"
+@inject Data data
+@inject CartClass cartClass
+@inject ILocalStorageService localStorage
 
 <PageTitle>Product</PageTitle>
-<h1>AAAAA</h1>
+@if(product is null) {
+    <p>Product not found</p>
+}
+else {
+<h1>@product.Name</h1>
+<p>@product.Description</p>
+<img src="@product.ImageUrl" style="width: 500px; height: 500px;" />
+<b>@product.PriceInUsd$</b>
+<button @onclick="() => AddToCart(product)">Add to cart</button>
+}
+@code {
+    [Parameter]
+    public int Id { get; set; }
+    public Product? product { get; set; } 
+    protected override async Task OnInitializedAsync() {
+        product = data.GetProduct(Id);
+    }
+    public async Task AddToCart(Product product) {
+        cartClass.ProductsInCart.Add(new Product(product.Id, product.Name, product.Description, product.ImageUrl, product.PriceInUsd));
+        await localStorage.SetItemAsync<List<Product>>("Cart", cartClass.ProductsInCart);
+    }
+}
